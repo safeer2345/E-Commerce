@@ -7,20 +7,20 @@ import javax.enterprise.context.ApplicationScoped;
 
 import com.aitrich.domain.entity.Category;
 import com.aitrich.domain.entity.OrderDetails;
-import com.aitrich.domain.entity.OrderEntity;
+import com.aitrich.domain.entity.PurchaseOrder;
 
 import io.smallrye.mutiny.Uni;
 
 @ApplicationScoped
 public interface OrderService {
 	
-	public Uni<OrderEntity> saveOrder(OrderEntity orderEntity);
+	public Uni<PurchaseOrder> saveOrder(PurchaseOrder orderEntity);
 	
 	public Uni<Long> deleteOneOrderItem(long oId,long oDId,Set<OrderDetails> orderDetails);
 
-	public Uni<OrderEntity> findOrderById(Long cid);
+	public Uni<PurchaseOrder> findOrderById(Long cid);
 	
-	public Uni<List<OrderEntity>> findAllOrders();
+	public Uni<List<PurchaseOrder>> findAllOrders();
 
 	public Uni<Boolean> deleteOrderById(Long cid);
 

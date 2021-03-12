@@ -25,9 +25,9 @@ public class OrderDetails {
 	@ManyToOne(/*fetch = FetchType.EAGER ,cascade = CascadeType.ALL */)
 	@JoinColumn(name = "order_id" , nullable = true)
 	@JsonIgnore
-	private OrderEntity order;
+	private PurchaseOrder order;
 
-	@ManyToOne(fetch = FetchType.EAGER, cascade = { CascadeType.MERGE, CascadeType.REFRESH })
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "product_id")
 	@JsonIgnore
 	private Product product;
@@ -60,11 +60,11 @@ public class OrderDetails {
 		this.id = id;
 	}
 
-	public OrderEntity getOrder() {
+	public PurchaseOrder getOrder() {
 		return order;
 	}
 
-	public void setOrder(OrderEntity order) {
+	public void setOrder(PurchaseOrder order) {
 		this.order = order;
 		// order.getOrderDetails().add(this);
 		// this.setOrder(order);

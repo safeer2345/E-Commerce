@@ -16,7 +16,7 @@ import org.hibernate.reactive.mutiny.Mutiny;
 import com.aitrich.customer.CustomerService;
 import com.aitrich.domain.entity.Category;
 import com.aitrich.domain.entity.OrderDetails;
-import com.aitrich.domain.entity.OrderEntity;
+import com.aitrich.domain.entity.PurchaseOrder;
 import com.aitrich.domain.repository.OrderDetailsRepository;
 import com.aitrich.domain.repository.OrderRepository;
 import com.aitrich.product.ProductService;
@@ -44,7 +44,7 @@ public class OrderServiceImpl implements OrderService {
 	// Set<OrderDetails> orderDetails=new HashSet<OrderDetails>();
 
 	@Override
-	public Uni<OrderEntity> saveOrder(OrderEntity orderEntity) {
+	public Uni<PurchaseOrder> saveOrder(PurchaseOrder orderEntity) {
 		// TODO Auto-generated method stub
 		orderEntity.getOrderDetails().forEach(od -> {
 			od.setOrder(orderEntity);
@@ -68,13 +68,13 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	public Uni<OrderEntity> findOrderById(Long cid) {
+	public Uni<PurchaseOrder> findOrderById(Long cid) {
 		// TODO Auto-generated method stub
 		return orderRepo.findById(cid);
 	}
 
 	@Override
-	public Uni<List<OrderEntity>> findAllOrders() {
+	public Uni<List<PurchaseOrder>> findAllOrders() {
 		// TODO Auto-generated method stub
 		return orderRepo.findAll().list();
 	}

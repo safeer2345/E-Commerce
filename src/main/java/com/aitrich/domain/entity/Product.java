@@ -19,7 +19,7 @@ public class Product {
 
 	private String productName;
 
-	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "category_id")
 	@JsonIgnore
 	private Category category;

@@ -27,7 +27,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Table(name = "orderentity")
-public class OrderEntity {
+public class PurchaseOrder {
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
@@ -47,11 +47,11 @@ public class OrderEntity {
 	//@JsonManagedReference
 	private Set<OrderDetails> orderDetails=new HashSet<OrderDetails>();
 
-	public OrderEntity() {
+	public PurchaseOrder() {
 		super();
 	}
 
-	public OrderEntity(long orderId, LocalDateTime date, Customer customer, Set<OrderDetails> orderDetails) {
+	public PurchaseOrder(long orderId, LocalDateTime date, Customer customer, Set<OrderDetails> orderDetails) {
 		super();
 		this.orderId = orderId;
 		this.date = date;
@@ -105,7 +105,7 @@ public class OrderEntity {
 		//getOrderDetails().remove(orderDetails);
 		//orderDetails.setOrder(null);
 		//getOrderDetails().clear();
-		
+		//orderDetails.getOrder().removeOrderDetail(orderDetails);	
 	}
 	
 	public void addOrderDetail(OrderDetails orderDetails )

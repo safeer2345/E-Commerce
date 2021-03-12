@@ -35,10 +35,10 @@ public class ProductServiceImpl implements ProductService {
 	public Uni<Product> saveProduct(Product product) {
 		// TODO Auto-generated method stub
 		//product.setCategory(null);
-		Uni<Category> categoryUni=categoryService.findCategoryById(product.getCategory().getCategoryId());
-		Category category= categoryUni.await().indefinitely();
-		product.setCategory(category);
-		System.out.println("saveProduct "+ product);
+	//	Uni<Category> categoryUni=categoryService.findCategoryById(product.getCategory().getCategoryId());
+	//	Category category= categoryUni.await().indefinitely();
+	//	product.setCategory(category);
+	//	System.out.println("saveProduct "+ product);
 		//repo.persist(product);
 		//session.persist(product);
 		return repo.persist(product).chain(repo::flush).onItem().transform(Ignore -> product);
