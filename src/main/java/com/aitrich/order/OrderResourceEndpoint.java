@@ -24,7 +24,6 @@ import com.aitrich.order.details.OrderDetailsService;
 import com.aitrich.order.request.OrderRequest;
 import com.aitrich.order.request.converter.OrderDetailsConverter;
 import com.aitrich.order.request.converter.OrderEntityConverter;
-import com.aitrich.order.search.OrderSearchService;
 import com.aitrich.order.search.converter.OrderEntityToOrderSearch;
 
 import io.smallrye.mutiny.Uni;
@@ -43,61 +42,42 @@ public class OrderResourceEndpoint {
 
 	@Inject
 	OrderDetailsConverter orderDetailsConverter;
-	
+
 	@Inject
 	OrderEntityToOrderSearch orderEntityToOrderSearch;
-	
-	@Inject
-	OrderSearchService orderSearchService;
 
 	@Inject
 	Mutiny.Session session;
 
-
 	@Mutation
 	public Uni<List<OrderSearch>> plceOrder(OrderRequest orderDto) throws InterruptedException, ExecutionException {
-		System.out.println(orderDto);
 		PurchaseOrder orderEntity = orderEntityConverter.convert(orderDto);
-		// System.out.println("bbbbbbbbbbbbbbbbbbbbbb"+orderEntitya);
-		// Uni<PurchaseOrder> purchaseOrderUni = orderService.saveOrder(orderEntitya);
-		// PurchaseOrder purchaseOrder = purchaseOrderUni.await().indefinitely();
-		//Uni<Boolean> status=orderSearchService.saveOrderIntoOrderSearch(orderEntityToOrderSearch.convert(purchaseOrder));
-		//System.out.println("aaaaaaaaaaaaaaaa" + status.await().indefinitely());
-		//List<OrderDetails> listOrderDetails = orderDetailsConverter.convert(orderDto, orderEntity.getId());
-		// return orderService.findOrderById(orderEntity.getOrderId());
-		//return purchaseOrderUni;
-		
-		//orderService.saveOrder(orderEntity).onItem().apply(orderSearchService.saveOrderIntoOrderSearch(orderEntityToOrderSearch.convert(orderEntity)));
-		
-		
-		 return orderService.saveOrder(orderEntity);
+		return orderService.saveOrder(orderEntity);
 	}
 
 	@Query
 	public Uni<List<OrderSearch>> findAllOrders() {
 
-		return orderSearchService.findAllOrderFromOrderSearch();
-		/*
-		 * List<OrderDetails> b=a.await().indefinitely(); b.forEach(order ->{
-		 * System.out.println(order); }); return a;
-		 */
+		return orderService.findAllOrderFromOrderSearch();
 	}
 
 	@Query
-	public Uni<PurchaseOrder> findOrderById(long id) {
+	public Uni<List<OrderSearch>> findOrderById(long id) {
 
-		return orderService.findOrderById(id);
-		/*
-		 * List<OrderDetails> b=a.await().indefinitely(); b.forEach(order ->{
-		 * System.out.println(order); }); return a;
-		 */
+		return orderService.findOrderByOrderId(id);
+	}
+	
+	@Query
+	public Uni<List<OrderSearch>> findOrderByCustomerId(long id) {
+
+		return orderService.findOrderByCustomerId(id);
 	}
 
 	@Mutation
 	public Uni<Boolean> deleteOrderById(long oId) {
 		return orderService.deleteOrderById(oId);
-		// return null;
 	}
+	
 
 	@Mutation
 	@Transactional
@@ -145,11 +125,11 @@ public class OrderResourceEndpoint {
 			if (od.getId() == oDId) {
 				// od.setOrder(null);
 				// orderEntity.removeOrderDetail(od);
-				 od.getOrder().removeOrderDetail(od);
-				//session.remove(od);
+				od.getOrder().removeOrderDetail(od);
+				// session.remove(od);
 			}
 		});
-		
+
 		session.persist(orderEntity);
 
 //		for (Iterator<OrderDetails> iterator = orderEntity.getOrderDetails().iterator(); iterator.hasNext();) {
@@ -186,10 +166,10 @@ public class OrderResourceEndpoint {
 
 		// return orderService.saveOrder(orderEntity);
 		// return orderService.deleteOneOrderItem(oId, oDId,null);
- 
+
 		// return session.persist(orderEntity).chain(session ::
 		// flush).onItem().transform(ignore -> orderEntity);
-		
+
 		return session.flush().onItem().transform(ignore -> orderEntity);
 
 		// return Uni.createFrom().item(orderEntity);
@@ -208,8 +188,5 @@ public class OrderResourceEndpoint {
 		// flush).onItem().transform(ignore -> orderEntity);
 	}
 
-	/*
-	 * @Query public
-	 */
 
 }

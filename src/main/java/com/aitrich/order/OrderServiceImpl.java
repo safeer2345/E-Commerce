@@ -53,24 +53,22 @@ public class OrderServiceImpl implements OrderService {
 	@Inject
 	OrderEntityToOrderSearch orderEntityToOrderSearch;
 
-	// Set<OrderDetails> orderDetails=new HashSet<OrderDetails>();
-
 	@Override
 	public Uni<List<OrderSearch>> saveOrder(PurchaseOrder orderEntity) throws InterruptedException, ExecutionException {
-		
+
 		orderEntity.getOrderDetails().forEach(od -> {
 			od.setOrder(orderEntity);
 		});
 
 		orderEntity.getOrderDetails().forEach(od -> {
-					Product product=toProduct(productService.findProductById(od.getProduct().getId()));
-					od.setProduct(product);
+			Product product = toProduct(productService.findProductById(od.getProduct().getId()));
+			od.setProduct(product);
 		});
 
 		customerService.findCustomerById(orderEntity.getCustomer().getId()).subscribe().with(customer -> {
 			orderEntity.setCustomer(customer);
 		});
-		
+
 		Function<PurchaseOrder, Uni<? extends List<OrderSearch>>> saveOrderSearch = entity -> {
 			List<OrderSearch> orderSearchList = orderEntityToOrderSearch.convert(entity);
 			return orderSearchRepository.persist(orderSearchList).chain(orderSearchRepository::flush).onItem()
@@ -94,46 +92,42 @@ public class OrderServiceImpl implements OrderService {
 		return product;
 	}
 
-	private Uni<Boolean> saveOs(PurchaseOrder indefinitely) {
-		// TODO Auto-generated method stub
-		return orderSearchRepository.persist(orderEntityToOrderSearch.convert(indefinitely)).onItem()
-				.transform(ignore -> true);
-	}
-
-	private Uni<PurchaseOrder> save(PurchaseOrder orderEntity) {
-		// TODO Auto-generated method stub
-		orderEntity.getOrderDetails().forEach(od -> {
-			od.setOrder(orderEntity);
-		});
-
-		orderEntity.getOrderDetails().forEach(od -> {
-			od.setProduct(productService.findProductById(od.getProduct().getId()).await().indefinitely());
-		});
-
-		orderEntity.setCustomer(
-				customerService.findCustomerById(orderEntity.getCustomer().getId()).await().indefinitely());
-
-		System.out.println(orderEntity);
-
-		return orderRepo.persistAndFlush(orderEntity).chain(orderRepo::flush).onItem().transform(ignore -> orderEntity);
-	}
-
 	@Override
 	public Uni<Boolean> deleteOrderById(Long cid) {
-		// TODO Auto-generated method stub
-		return orderRepo.deleteById(cid).chain(orderDetailsRepo::flush).onItem().transform(ignore -> true);
+
+		Function<? super Boolean, Uni<?>> delete = odId -> {
+			return orderSearchRepository.delete("purchaseorderid", cid).chain(orderSearchRepository::flush).onItem()
+					.transform(ignore -> true);
+		};
+		return orderRepo.deleteById(cid).chain(orderRepo::flush).onItem().transform(ignore -> true).call(delete);
 	}
 
 	@Override
 	public Uni<PurchaseOrder> findOrderById(Long cid) {
-		// TODO Auto-generated method stub
 		return orderRepo.findById(cid);
 	}
 
 	@Override
 	public Uni<List<PurchaseOrder>> findAllOrders() {
-		// TODO Auto-generated method stub
 		return orderRepo.findAll().list();
+	}
+	
+	@Override
+	public Uni<List<OrderSearch>> findAllOrderFromOrderSearch() {
+		// TODO Auto-generated method stub
+		return orderSearchRepository.findAll().list();
+	}
+
+	@Override
+	public Uni<List<OrderSearch>> findOrderByOrderId(long id) {
+		// TODO Auto-generated method stub
+		return orderSearchRepository.find("purchaseorderid", id).list();
+	}
+
+	@Override
+	public Uni<List<OrderSearch>> findOrderByCustomerId(long id) {
+		// TODO Auto-generated method stub
+		return orderSearchRepository.find("customerid", id).list();
 	}
 
 	@Override

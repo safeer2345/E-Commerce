@@ -26,4 +26,10 @@ public interface OrderService {
 
 	public Uni<Boolean> deleteOrderById(Long cid);
 
+	public Uni<List<OrderSearch>> findAllOrderFromOrderSearch();
+
+	public Uni<List<OrderSearch>> findOrderByOrderId(long id);
+
+	public Uni<List<OrderSearch>> findOrderByCustomerId(long id);
+
 }
