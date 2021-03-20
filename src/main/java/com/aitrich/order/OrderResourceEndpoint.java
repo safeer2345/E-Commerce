@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -16,12 +17,15 @@ import org.hibernate.cache.spi.support.AbstractReadWriteAccess.Item;
 import org.hibernate.reactive.mutiny.Mutiny;
 
 import com.aitrich.domain.entity.OrderDetails;
+import com.aitrich.domain.entity.OrderSearch;
 import com.aitrich.domain.entity.PurchaseOrder;
 import com.aitrich.domain.repository.OrderRepository;
 import com.aitrich.order.details.OrderDetailsService;
 import com.aitrich.order.request.OrderRequest;
 import com.aitrich.order.request.converter.OrderDetailsConverter;
 import com.aitrich.order.request.converter.OrderEntityConverter;
+import com.aitrich.order.search.OrderSearchService;
+import com.aitrich.order.search.converter.OrderEntityToOrderSearch;
 
 import io.smallrye.mutiny.Uni;
 
@@ -39,27 +43,40 @@ public class OrderResourceEndpoint {
 
 	@Inject
 	OrderDetailsConverter orderDetailsConverter;
+	
+	@Inject
+	OrderEntityToOrderSearch orderEntityToOrderSearch;
+	
+	@Inject
+	OrderSearchService orderSearchService;
 
 	@Inject
 	Mutiny.Session session;
 
+
 	@Mutation
-	public Uni<PurchaseOrder> plceOrder(OrderRequest orderDto) {
+	public Uni<List<OrderSearch>> plceOrder(OrderRequest orderDto) throws InterruptedException, ExecutionException {
 		System.out.println(orderDto);
-		PurchaseOrder orderEntitya = orderEntityConverter.convert(orderDto);
+		PurchaseOrder orderEntity = orderEntityConverter.convert(orderDto);
 		// System.out.println("bbbbbbbbbbbbbbbbbbbbbb"+orderEntitya);
-		// Uni<OrderEntity> asd = orderService.saveOrder(orderEntitya);
-//		OrderEntity orderEntity = asd.await().indefinitely();
-//		System.out.println("aaaaaaaaaaaaaaaa" + orderEntity);
-//		List<OrderDetails> listOrderDetails = orderDetailsConverter.convert(orderDto, orderEntity.getId());
+		// Uni<PurchaseOrder> purchaseOrderUni = orderService.saveOrder(orderEntitya);
+		// PurchaseOrder purchaseOrder = purchaseOrderUni.await().indefinitely();
+		//Uni<Boolean> status=orderSearchService.saveOrderIntoOrderSearch(orderEntityToOrderSearch.convert(purchaseOrder));
+		//System.out.println("aaaaaaaaaaaaaaaa" + status.await().indefinitely());
+		//List<OrderDetails> listOrderDetails = orderDetailsConverter.convert(orderDto, orderEntity.getId());
 		// return orderService.findOrderById(orderEntity.getOrderId());
-		return orderService.saveOrder(orderEntitya);
+		//return purchaseOrderUni;
+		
+		//orderService.saveOrder(orderEntity).onItem().apply(orderSearchService.saveOrderIntoOrderSearch(orderEntityToOrderSearch.convert(orderEntity)));
+		
+		
+		 return orderService.saveOrder(orderEntity);
 	}
 
 	@Query
-	public Uni<List<PurchaseOrder>> findAllOrders() {
+	public Uni<List<OrderSearch>> findAllOrders() {
 
-		return orderService.findAllOrders();
+		return orderSearchService.findAllOrderFromOrderSearch();
 		/*
 		 * List<OrderDetails> b=a.await().indefinitely(); b.forEach(order ->{
 		 * System.out.println(order); }); return a;
@@ -172,6 +189,7 @@ public class OrderResourceEndpoint {
  
 		// return session.persist(orderEntity).chain(session ::
 		// flush).onItem().transform(ignore -> orderEntity);
+		
 		return session.flush().onItem().transform(ignore -> orderEntity);
 
 		// return Uni.createFrom().item(orderEntity);

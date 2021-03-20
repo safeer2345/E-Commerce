@@ -26,7 +26,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
-@Table(name = "orderentity")
+@Table(name = "PurchaseOrder")
 public class PurchaseOrder {
 
 	@Id
